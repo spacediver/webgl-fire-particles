@@ -19,40 +19,40 @@ window.onload = main;
 
 var options = {
   // this option is not actually in the UI
-  fireEmitPositionSpread: {x:100,y:20},
+  fireEmitPositionSpread: {x:20,y:20},
 
   fireEmitRate: 1600,
   fireEmitRateSlider: {min:1,max:5000},
 
-  fireSize: 40.0,
+  fireSize: 15.0,
   fireSizeSlider: {min:2.0,max:100.0},
 
   fireSizeVariance:  100.0,
   fireSizeVarianceSlider: {min:0.0,max:100.0},
 
-  fireEmitAngleVariance: 0.42,
-  fireEmitAngleVarianceSlider: {min:0.0,max:Math.PI/2},
+  fireEmitAngleVariance: Math.PI,
+  fireEmitAngleVarianceSlider: {min:0.0,max:Math.PI},
 
-  fireSpeed: 200.0,
+  fireSpeed: 37,
   fireSpeedSlider: {min:20.0,max:500},
 
-  fireSpeedVariance: 80.0,
+  fireSpeedVariance: 10.0,
   fireSpeedVarianceSlider: {min:0.0,max:100.0},
 
   fireDeathSpeed: 0.003,
   fireDeathSpeedSlider: {min: 0.001, max: 0.05},
 
-  fireTriangleness: 0.00015,
+  fireTriangleness: 0.000027,
   fireTrianglenessSlider: {min:0.0, max:0.0003},
 
-  fireTextureHue: 25.0,
+  fireTextureHue: -121.0,
   fireTextureHueSlider: {min:-180,max:180},
 
-  fireTextureHueVariance: 15.0,
+  fireTextureHueVariance: 3.0,
   fireTextureHueVarianceSlider: {min:0.0,max:180},
 
   fireTextureColorize: true,
-  wind: true,
+  wind: false,
   omnidirectionalWind:false,
 
   windStrength:20.0,
@@ -61,7 +61,7 @@ var options = {
   windTurbulance:0.0003,
   windTurbulanceSlider:{min:0.0,max:0.001},
 
-  sparks: true,
+  sparks: false,
 
   // some of these options for sparks are not actually available in the UI to save UI space
   sparkEmitRate: 6.0,
@@ -84,6 +84,8 @@ var options = {
 
 };
 
+var initial_options = options;
+
 textureList = ["rectangle.png","circle.png","gradient.png","thicker_gradient.png","explosion.png","flame.png","smilie.png","heart.png"];
 images = [];
 textures = [];
@@ -95,11 +97,11 @@ function loadTexture(textureName,index) {
   images[index].onload = function() {handleTextureLoaded(images[index],index,textureName)};
   images[index].onerror = function() {alert("ERROR: texture " + textureName + " can't be loaded!"); console.error("ERROR: texture " + textureName + " can't be loaded!");};
   images[index].src = textureName;
-  console.log("starting to load " + textureName);
+  //console.log("starting to load " + textureName);
 }
 
 function handleTextureLoaded(image,index,textureName) {
-  console.log("loaded texture " + textureName);
+  //console.log("loaded texture " + textureName);
   gl.bindTexture(gl.TEXTURE_2D, textures[index]);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -189,6 +191,14 @@ function canvasCoordinates(canvas,pos) {
 function handleMouseDown(event) {
  mouseDown = true;
  mousePos = canvasCoordinates(canvas,{x:event.clientX,y:event.clientY});
+ console.log(mousePos);
+ //options.fireEmitRate *= 1.1;
+ options.fireSpeed = 180;
+ options.fireSpeedVariance = 54;
+ options.fireDeathSpeed = 0.001;
+ options.fireSize = 20;
+ options.fireTextureHue = 25;
+ options.fireTextureHueVariance = 70;
 }
 
 function handleMouseMove(event) {
@@ -202,7 +212,7 @@ function handleMouseUp(event) {
 function setupSlider(id,valueId,value,sliderMinMax,step,changeCallback) {
   var slider = document.getElementById(id);
   var sliderDiv = document.getElementById(valueId);
-  console.log(id + " " + valueId);
+  //console.log(id + " " + valueId);
   slider.min = sliderMinMax.min;
   slider.max = sliderMinMax.max;
   slider.step = step;
@@ -369,7 +379,7 @@ function logic() {
 
   particleDiscrepancy += options.fireEmitRate*(timeDifference)/1000.0;
   while (particleDiscrepancy > 0) {
-    createFireParticle({x:canvas.width/2,y:canvas.height/2+200});
+    createFireParticle({x:canvas.width/2,y:canvas.height/2});
     particleDiscrepancy -= 1.0;
   }
 
@@ -442,7 +452,7 @@ function render() {
   drawRects(fireParticles);
   if (options.sparks)
       drawRects(sparkParticles);
-  console.log(particleAverage);
+  //console.log(particleAverage);
 }
 
 
